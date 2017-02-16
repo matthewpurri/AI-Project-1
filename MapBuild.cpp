@@ -587,7 +587,7 @@ void endpoints(Coordinate map[][COL], int goals[][2]) {
 
 		float dist = sqrt(pow((start_x - goal_x), 2) + pow((start_y - goal_y), 2));
 
-		while (dist < 100 || checkVertices(map,start_x,start_y,goal_x,goal_y) == false) { // try new points
+		while (dist < 100 || checkVertices(map, start_x, start_y, goal_x, goal_y) == false) { // try new points
 			start_x = rand() % ROW;
 			start_y = rand() % 20;
 			goal_x = rand() % ROW;
@@ -596,10 +596,10 @@ void endpoints(Coordinate map[][COL], int goals[][2]) {
 		}
 
 		// Add vertices to array for making file
-		goals[0 + i*2][0] = start_x;
-		goals[0 + i*2][1] = start_y;
-		goals[1 + i*2][0] = goal_x;
-		goals[1 + i*2][1] = goal_y;
+		goals[0 + i * 2][0] = start_x;
+		goals[0 + i * 2][1] = start_y;
+		goals[1 + i * 2][0] = goal_x;
+		goals[1 + i * 2][1] = goal_y;
 		printf("Start: (%d,%d), Goal: (%d,%d), Distance: %f \n", start_x, start_y, goal_x, goal_y, dist);
 	}
 }

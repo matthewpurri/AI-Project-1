@@ -22,6 +22,8 @@ public:
 	node* next = NULL;
 	node* prev = NULL;
 	node * nextI = NULL;
+	int heur;
+	double weight;
 
 
 	void setNode(char ter, int xCord, int yCord, node * goalNode, double w, int heur);
@@ -50,6 +52,7 @@ public:
 	Fringe();
 	void remove(node * curNode);
 	node * pop();
+	double peek();
 	void insert(node * curNode, double key);
 	~Fringe();
 };

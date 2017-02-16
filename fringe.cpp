@@ -52,6 +52,10 @@ node *Fringe::pop() {
 
 }
 
+double Fringe::peek() {
+	double re = this->head->getF();
+	return re;
+}
 void Fringe::insert(node * curNode, double key) {
 
 	node * ptr1 = new node;
@@ -82,7 +86,7 @@ void Fringe::insert(node * curNode, double key) {
 		}
 	}
 }
-void node::setNode(char ter, int xCord, int yCord, node * goalNode, double w, int heur) {
+void node::setNode(char ter, int xCord, int yCord, node * goalNode,double w, int heur) {
 	char terC = ter;
 	switch (ter) {
 	case'0':
@@ -105,7 +109,7 @@ void node::setNode(char ter, int xCord, int yCord, node * goalNode, double w, in
 	this->xCord = xCord;
 	this->yCord = yCord;
 	calcC();
-	calcH(goalNode, w, heur);
+	calcH(goalNode,w, heur);
 	calcG();
 	calcF();
 }
@@ -128,16 +132,17 @@ void node::setStart(char ter, int xCord, int yCord, node * goalNode, double w, i
 		this->ter = 0.5;
 		break;
 	}
-
+	this->weight = w;
+	this->heur = heur;
 	this->xCord = xCord;
 	this->yCord = yCord;
-	calcH(goalNode, w, heur);
+	calcH(goalNode,w,heur);
 	this->gVal = 0;
 	calcF();
 	cVal = 0;
 }
 
-void node::setGoal(char ter, int xCord, int yCord, double w) {
+void node::setGoal(char ter, int xCord, int yCord,double w) {
 	char terC = ter;
 	switch (ter) {
 	case'0':
@@ -203,59 +208,79 @@ double node::getC() {
 	return cVal;
 }
 void node::calcH(node * goalNode, double w, int heur) {
-	if (heur == 1) {                                                                // Distance from goal to current node (1)
-		int xDis = goalNode->xCord - xCord;
-		int yDis = goalNode->yCord - yCord;
-		float sum = xDis*xDis + yDis*yDis;
-		hVal = sqrt(sum)*w;
-	}
-	else if (heur == 2) {                                                            //  Manhattan
-		hVal = w*(abs(goalNode->xCord - xCord) + abs(goalNode->yCord - yCord));
-	}
-	else if (heur == 3) {                                                           //  No Blocked Cells(3)
 
-		int diagM = abs(goalNode->xCord - xCord);
-		int horizM = abs(goalNode->xCord - diagM);
-		double sum = sqrt(2)*diagM + horizM;
-		hVal = w* sum;
-	}
-	else if (heur == 4) {                                                       //  Horizontal cells are easier to traverse than vertical cells(4)
-		int xDis = goalNode->xCord - xCord;
-		int yDis = goalNode->yCord - yCord;
-		float sum = 0.5*xDis*xDis + yDis*yDis;
-		hVal = sqrt(sum)*w;
-	}
-	else if (heur == 5) {                                                      // Midpoint (5)
-		int xDis = goalNode->xCord - xCord;
-		int yDis = goalNode->yCord - yCord;
-		float sum = xDis*xDis + yDis*yDis;
-		float dis = sqrt(sum);
-		if (dis >= 50) {
-			if (abs(goalNode->xCord - xCord - 50) > abs(goalNode->yCord - yCord - 50)) {
-				hVal = abs(goalNode->xCord - xCord - 50)*w;
-			}
-			else
-				hVal = abs(goalNode->yCord - yCord - 50)*w;
+	switch (heur) {
+		case (2):
+		{                                                                // Distance from goal to current node (1)
+			int xDis = goalNode->xCord - xCord;
+			int yDis = goalNode->yCord - yCord;
+			float sum = xDis*xDis + yDis*yDis;
+			hVal = sqrt(sum)*w;
+			break;
 		}
-		else if (dis >= 25) {
-			if (abs(goalNode->xCord - xCord - 25) > abs(goalNode->yCord - yCord - 25)) {
-				hVal = abs(goalNode->xCord - xCord - 25)*w;
-			}
-			else
-				hVal = abs(goalNode->yCord - yCord - 25)*w;
+		case 1: {                                                            //  Manhattan
+			hVal = w*(abs(goalNode->xCord - xCord) + abs(goalNode->yCord - yCord));
+			break;
 		}
-		else {
-			if (abs(goalNode->xCord - xCord - 5) > abs(goalNode->yCord - yCord - 5)) {
-				hVal = abs(goalNode->xCord - xCord - 5)*w;
+		case 3: {                                                           //  No Blocked Cells(3)
+
+			int xDis = abs(goalNode->xCord - xCord);
+			int yDis = abs(goalNode->yCord - yCord);
+
+			if (xDis > yDis) {
+				double sum = sqrt(2)*yDis + xDis - yDis;
+				hVal = w* sum;
 			}
-			else
-				hVal = abs(goalNode->yCord - yCord - 5)*w;
+			else {
+				double sum = sqrt(2)*xDis + yDis - xDis;
+				hVal = w* sum;
+			}
+			break;
 		}
+		case 4: {                                                       //  Horizontal cells are easier to traverse than vertical cells(4)
+			int xDis = goalNode->xCord - xCord;
+			int yDis = goalNode->yCord - yCord;
+			float sum = 0.5*xDis*xDis + yDis*yDis;
+			hVal = sqrt(sum)*w;
+			break;
+		}
+		case 5: {                                                      // Midpoint (5)
+			int xDis = goalNode->xCord - xCord;
+			int yDis = goalNode->yCord - yCord;
+			float sum = xDis*xDis + yDis*yDis;
+			float dis = sqrt(sum);
+			if (dis >= 50) {
+				if (abs(goalNode->xCord - xCord - 50) > abs(goalNode->yCord - yCord - 50)) {
+					hVal = abs(goalNode->xCord - xCord - 50)*w;
+					
+				}
+				else
+					hVal = abs(goalNode->yCord - yCord - 50)*w;
+				
+			}
+			else if (dis >= 25) {
+				if (abs(goalNode->xCord - xCord - 25) > abs(goalNode->yCord - yCord - 25)) {
+					hVal = abs(goalNode->xCord - xCord - 25)*w;
+					
+				}
+				else
+					hVal = abs(goalNode->yCord - yCord - 25)*w;
+				
+			}
+			else {
+				if (abs(goalNode->xCord - xCord - 5) > abs(goalNode->yCord - yCord - 5)) {
+					hVal = abs(goalNode->xCord - xCord - 5)*w;
+					
+				}
+				else
+					hVal = abs(goalNode->yCord - yCord - 5)*w;
+				
+			}
+			break;
+		}
+			cout << " error incorrect choice for heuristic" << endl;
 	}
-	else
-		cout << " error incorrect choice for heuristic" << endl;
 }
-
 double node::getH() {
 	return hVal;
 }
@@ -272,3 +297,4 @@ bool node::updateVer() {
 	}
 	return false;
 }
+
